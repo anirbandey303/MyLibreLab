@@ -90,11 +90,11 @@ public class Sleep extends JVSMain
     try
     {
       Thread.sleep(time.getValue());
-    } catch(InterruptedException e){
-      Logger.error(e);
+    } catch(InterruptedException ex){
+      Logger.error(ex);
     }
-    catch(DateTimeException e){
-      Logger.error(e);
+    catch(DateTimeException ex){
+      Logger.error(ex);
     }
   }
   

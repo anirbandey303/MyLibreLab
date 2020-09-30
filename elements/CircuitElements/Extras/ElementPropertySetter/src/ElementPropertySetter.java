@@ -123,10 +123,10 @@ public class ElementPropertySetter extends JVSMain {
         selectedID.setValue(id);
         selectedCaption.setValue(caption);
       }
-    } catch (ArrayIndexOutOfBoundsException e) {
-      Logger.error(e);
-    } catch (NullPointerException e) {
-      Logger.error(e);
+    } catch (ArrayIndexOutOfBoundsException ex) {
+      Logger.error(ex);
+    } catch (NullPointerException ex) {
+      Logger.error(ex);
     }
   }
 
