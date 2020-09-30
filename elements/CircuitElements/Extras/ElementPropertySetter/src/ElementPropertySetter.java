@@ -19,7 +19,6 @@
 //* Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA                  *
 //*****************************************************************************
 
-
 import VisualLogic.*;
 import VisualLogic.variables.*;
 import tools.*;
@@ -27,170 +26,152 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.Timer;
 
-public class ElementPropertySetter extends JVSMain
-{
+public class ElementPropertySetter extends JVSMain {
   private Image image;
 
+  private VSBoolean inVisible = new VSBoolean(true);
+  private VSInteger inLeft = new VSInteger(0);
+  private VSInteger inTop = new VSInteger(0);
+  private VSInteger inWidth = new VSInteger(0);
+  private VSInteger inHeight = new VSInteger(0);
 
-  private VSBoolean inVisible            = new VSBoolean(true);
-  private VSInteger inLeft               = new VSInteger(0);
-  private VSInteger inTop                = new VSInteger(0);
-  private VSInteger inWidth              = new VSInteger(0);
-  private VSInteger inHeight             = new VSInteger(0);
-
-  private VSComboBox elList=new VSComboBox();
+  private VSComboBox elList = new VSComboBox();
   private VSInteger selectedID = new VSInteger(-1);
   private VSString selectedCaption = new VSString("");
-  
-  private VSBasisIF basis=null;
+
+  private VSBasisIF basis = null;
 
   private javax.swing.Timer timer;
 
-  private ExternalIF elements[]=null;
-  private ExternalIF selectedElement=null;
+  private ExternalIF elements[] = null;
+  private ExternalIF selectedElement = null;
 
-  public void paint(java.awt.Graphics g)
-  {
-    drawImageCentred(g,image);
+  public void paint(java.awt.Graphics g) {
+    drawImageCentred(g, image);
   }
 
-  public void onDispose()
-  {
-    if (image!=null)
-    {
+  public void onDispose() {
+    if (image != null) {
       image.flush();
-      image=null;
+      image = null;
     }
   }
-  public void init()
-  {
-    initPins(0,0,0,5);
-    setSize(50,25+(5*10));
+
+  public void init() {
+    initPins(0, 0, 0, 5);
+    setSize(50, 25 + (5 * 10));
     element.jSetInnerBorderVisibility(true);
     element.jSetLeftPinsVisible(true);
     element.jSetTopPinsVisible(false);
     element.jSetRightPinsVisible(false);
     element.jSetBottomPinsVisible(false);
 
-    image=element.jLoadImage(element.jGetSourcePath()+"icon.png");
-    
-    element.jInitPins();
-    
-    setPin(0,ExternalIF.C_BOOLEAN,element.PIN_INPUT);
-    setPin(1,ExternalIF.C_INTEGER,element.PIN_INPUT);
-    setPin(2,ExternalIF.C_INTEGER,element.PIN_INPUT);
-    setPin(3,ExternalIF.C_INTEGER,element.PIN_INPUT);
-    setPin(4,ExternalIF.C_INTEGER,element.PIN_INPUT);
-    
-    element.jSetPinDescription(0,"Visible");
-    element.jSetPinDescription(1,"Left");
-    element.jSetPinDescription(2,"Top");
-    element.jSetPinDescription(3,"Width");
-    element.jSetPinDescription(4,"Height");
+    image = element.jLoadImage(element.jGetSourcePath() + "icon.png");
 
-    
+    element.jInitPins();
+
+    setPin(0, ExternalIF.C_BOOLEAN, element.PIN_INPUT);
+    setPin(1, ExternalIF.C_INTEGER, element.PIN_INPUT);
+    setPin(2, ExternalIF.C_INTEGER, element.PIN_INPUT);
+    setPin(3, ExternalIF.C_INTEGER, element.PIN_INPUT);
+    setPin(4, ExternalIF.C_INTEGER, element.PIN_INPUT);
+
+    element.jSetPinDescription(0, "Visible");
+    element.jSetPinDescription(1, "Left");
+    element.jSetPinDescription(2, "Top");
+    element.jSetPinDescription(3, "Width");
+    element.jSetPinDescription(4, "Height");
+
     setName("ElementPropertySetter");
-    
-    
 
   }
-  
-  public void xOnInit()
-  {
 
-    timer = new javax.swing.Timer(1000, new ActionListener()
-    {
-        public void actionPerformed(ActionEvent evt)
-        {
-          doRefreshList();
-        }
+  public void xOnInit() {
+
+    timer = new javax.swing.Timer(1000, new ActionListener() {
+      public void actionPerformed(ActionEvent evt) {
+        doRefreshList();
+      }
     });
-    
+
     timer.start();
 
   }
-  
 
-  private void doRefreshList()
-  {
-    basis=element.jGetBasis();
-    elements=basis.vsGetListOfPanelElements();
+  private void doRefreshList() {
+    basis = element.jGetBasis();
+    elements = basis.vsGetListOfPanelElements();
 
     elList.clear();
-    for (int i=0;i<elements.length;i++)
-    {
+    for (int i = 0; i < elements.length; i++) {
       elList.addItem(elements[i].jGetCaption());
     }
 
-    elList.selectedIndex=getIndexOfElement(selectedID.getValue(),selectedCaption.getValue());
+    elList.selectedIndex = getIndexOfElement(selectedID.getValue(), selectedCaption.getValue());
   }
 
-  public void setPropertyEditor()
-  {
-    element.jAddPEItem("Element",elList, 0,0);
+  public void setPropertyEditor() {
+    element.jAddPEItem("Element", elList, 0, 0);
 
   }
-  public void propertyChanged(Object o)
-  {
-    try{
-    if (o.equals(elList))
-    {
-      int id=elements[elList.selectedIndex].jGetID();
-      String caption=elements[elList.selectedIndex].jGetCaption();
-      selectedID.setValue(id);
-      selectedCaption.setValue(caption);
+
+  public void propertyChanged(Object o) {
+    try {
+      if (o.equals(elList)) {
+        int id = elements[elList.selectedIndex].jGetID();
+        String caption = elements[elList.selectedIndex].jGetCaption();
+        selectedID.setValue(id);
+        selectedCaption.setValue(caption);
+      }
+    } catch (ArrayIndexOutOfBoundsException e) {
+      Logger.error(e);
+    } catch (NullPointerException e) {
+      Logger.error(e);
     }
-  }catch(Exception e){}
   }
 
-  public void start()
-  {
+  public void start() {
     doRefreshList();
-    int index=getIndexOfElement(selectedID.getValue(),selectedCaption.getValue());
+    int index = getIndexOfElement(selectedID.getValue(), selectedCaption.getValue());
 
-    if (index>-1)
-    {
+    if (index > -1) {
 
-      selectedElement=elements[index];
-    } else
-    {
-      selectedElement=null;
+      selectedElement = elements[index];
+    } else {
+      selectedElement = null;
     }
 
   }
 
-  public void initInputPins()
-  {
-    inVisible=(VSBoolean)element.getPinInputReference(0);
-    inLeft=(VSInteger)element.getPinInputReference(1);
-    inTop=(VSInteger)element.getPinInputReference(2);
-    inWidth=(VSInteger)element.getPinInputReference(3);
-    inHeight=(VSInteger)element.getPinInputReference(4);
+  public void initInputPins() {
+    inVisible = (VSBoolean) element.getPinInputReference(0);
+    inLeft = (VSInteger) element.getPinInputReference(1);
+    inTop = (VSInteger) element.getPinInputReference(2);
+    inWidth = (VSInteger) element.getPinInputReference(3);
+    inHeight = (VSInteger) element.getPinInputReference(4);
   }
 
-
-  public void process()
-  {
-    if (selectedElement!=null)
-    {
-      if (inVisible!=null) selectedElement.jSetVisible(inVisible.getValue());
-      if (inLeft!=null) selectedElement.jSetLeft(inLeft.getValue());
-      if (inTop!=null) selectedElement.jSetTop(inTop.getValue());
-      if (inWidth!=null) selectedElement.jSetSize(inWidth.getValue(), selectedElement.jGetHeight());
-      if (inHeight!=null) selectedElement.jSetSize(selectedElement.jGetWidth(),inHeight.getValue());
+  public void process() {
+    if (selectedElement != null) {
+      if (inVisible != null)
+        selectedElement.jSetVisible(inVisible.getValue());
+      if (inLeft != null)
+        selectedElement.jSetLeft(inLeft.getValue());
+      if (inTop != null)
+        selectedElement.jSetTop(inTop.getValue());
+      if (inWidth != null)
+        selectedElement.jSetSize(inWidth.getValue(), selectedElement.jGetHeight());
+      if (inHeight != null)
+        selectedElement.jSetSize(selectedElement.jGetWidth(), inHeight.getValue());
     }
   }
 
+  private int getIndexOfElement(int id, String caption) {
+    for (int i = 0; i < elements.length; i++) {
+      int idx = elements[i].jGetID();
+      String captionx = elements[i].jGetCaption();
 
-  private int getIndexOfElement(int id, String caption)
-  {
-    for (int i=0;i<elements.length;i++)
-    {
-      int idx=elements[i].jGetID();
-      String captionx=elements[i].jGetCaption();
-
-      if (id==idx && caption.equalsIgnoreCase(captionx))
-      {
+      if (id == idx && caption.equalsIgnoreCase(captionx)) {
         return i;
       }
     }
@@ -198,20 +179,14 @@ public class ElementPropertySetter extends JVSMain
     return -1;
   }
 
-
-  public void loadFromStream(java.io.FileInputStream fis)
-  {
-     selectedID.loadFromStream(fis);
-     selectedCaption.loadFromStream(fis);
+  public void loadFromStream(java.io.FileInputStream fis) {
+    selectedID.loadFromStream(fis);
+    selectedCaption.loadFromStream(fis);
   }
 
-
-  public void saveToStream(java.io.FileOutputStream fos)
-  {
+  public void saveToStream(java.io.FileOutputStream fos) {
     selectedID.saveToStream(fos);
     selectedCaption.saveToStream(fos);
   }
 
-
 }
-
