@@ -224,7 +224,9 @@ public class Get_Bytes_at_Port_JV extends JVSMain
       firstTime=false;    
       try { 
         Thread.currentThread().sleep(StartUpDelay.getValue());
-      } catch (InterruptedException ex) {}
+      } catch (InterruptedException ex) {
+        Logger.error(ex);
+      }
       }
      
      try{
@@ -269,7 +271,8 @@ public class Get_Bytes_at_Port_JV extends JVSMain
          element.notifyPin(3); // BytesAtPortOut
          element.notifyPin(0); // BytesAtPortIndicatorOut Duplicated to avoid use "Node" element
          //Logger.getLogger(SerialPort_Transaction_JV.class.getName()).log(Level.SEVERE, null, e);
-         System.out.println(Element_Tag+Error_Tag+e.getMessage());
+         //System.out.println(Element_Tag+Error_Tag+e.getMessage());
+         Logger.error(Element_Tag+Error_Tag+e.getMessage());
      }
       
    }
